@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>RESUME UPLOADED</title>
+    </head>
+    <body>
+        <h1>Resume Uploaded Successfully!!!</h1>
+        <p>your resume has been uploaded</p>
+        <h3> {{filename}}</h3>
+
+        <h2>Extracted Text</h2>
+        <pre>{{resume_text}}</pre>
+
+        <h2>Skills Found</h2>
+        <ul>
+            {% for skill in skills %}
+            <li>{{skill}}</li>
+            {% endfor %}
+        </ul>
+             
+        <h2>Education</h2>
+        <pre>{{education}}</pre>
+
+        <h2>projects</h2>
+        <pre>{{projects}}</pre>
+
+        <h2>Internship</h2>
+        <pre>{{ internship }}</pre>
+
+        <h2>Detected Sections</h2>
+        <ul>
+            {%for section in sections %}
+            <li>{{section}}</li>
+            {% endfor %}
+        </ul>
+        
+        <h2>Resume Score</h2>
+        <h1>{{score}}/100</h1>
+        <h2>Score Breakdown</h2>
+
+        <p>Professional Summary: {{ summary_score }}/10</p>
+
+        <p>Skills: {{ skill_score }}/25</p>
+
+        <p>Education: {{ education_score }}/20</p>
+
+        <p>Projects: {{ projects_score }}/20</p>
+
+        <p>Internship / Experience: {{ internship_score }}/15</p>
+
+        <p>Leadership: {{ leadership_score }}/5</p>
+
+        <p>Soft Skills: {{ softskill_score }}/5</p>  
+
+
+        <h2>Recommendations</h2>
+
+        <ul>
+
+         {% for recommendation in recommendations %}
+
+         <li>{{ recommendation }}</li>
+
+        {% endfor %}
+
+        </ul>
+
+        <h2>Job Description</h2>
+
+        <p>{{ job_description }}</p>
+
+        <h2>Job Match Score</h2>
+
+        <h1>{{ match_score }}%</h1>
+
+        <h2>Job Skills</h2>
+
+       <ul>
+         {% for skill in job_skills %}
+        <li>{{ skill }}</li>
+        {% endfor %}
+       </ul>
+
+       <h2>Matched Skills</h2>
+
+       <ul>
+        {% for skill in matched_skills %}
+         <li>{{ skill }}</li>
+        {% endfor %}
+      </ul>
+
+      <h2>Missing Skills</h2>
+
+      <ul>
+        {% for skill in missing_skills %}
+        <li>{{ skill }}</li>
+        {% endfor %}
+      </ul>       
+
+       <h2>AI Semantic Match Score</h2>
+
+       <h1>{{ ai_match_score }}%</h1>
+        
+
+       <h2>Project Relevance Score</h2>
+       <h1>{{ project_relevance_score}}%</h1>
+
+       <h2> FINAL AI MATCH SCORE:</h2>
+       <h1>{{final_match_score}}%</h1>
+
+        <br>
+        <a href ="/">
+            <button type="button">Back To Home</button>
+            </a>
+    </body>
+</html>
+

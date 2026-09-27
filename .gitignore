@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Uploaded files
+uploads/
+
+# Test/generated files
+dump.txt
+
+# OS / editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Large ML model
+models/all-MiniLM-L6-v2/model.onnx

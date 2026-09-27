@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AI RESUME ANALYZER</title>
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}" >       
+    </head>
+
+    <body>
+    <div class="container">
+        <h1>WELCOME TO AI RESUME ANALYZER HOME</h1>
+
+    <p class="subtitle">
+        Upload your resume and get ai review....
+    </p>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+
+    <input type = "file" name="resume" required>
+    <br><br>
+
+    <label> Job Description </label>
+    <br><br>
+    <textarea name = "job_description"
+              rows = "10"
+              cols = "60"
+              placeholder="paste job description here..."
+              required>
+            </textarea>
+    <button type="submit" name >submit</button>
+    <a href="/about">
+        <button type="button">about</button>
+    </a>
+    </form>
+        <p>POWERED BY SFKT TECHNOLOGIES</p>
+    </div>   
+    </body>
+</html>
