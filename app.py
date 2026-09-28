@@ -218,24 +218,45 @@ def match_job_skills(skills, job_description):
         matched_skills,
         missing_skills,
         match_score
-    )     
+    ) 
 
 def detect_sections(text):
-    text=text.lower()
-    found_sections=[]
-    for section in SECTIONS:
-        if section in text:
-            found_sections.append(section)
-    return found_sections        
-def extract_section(text, start_section, end_sections):
+    lines = text.splitlines()
+    found_sections = []
 
+    for line in lines:
+        clean_line = line.strip().lower()
+
+        if clean_line in SECTIONS:
+            found_sections.append(clean_line)
+
+    return found_sections 
+def normalize_heading(text):
+    return re.sub(r'[^a-z0-9]', '', text.lower())
+
+def normalize_pdf_text(text):
+    # Fix words broken by a hyphen and a space
+    text = re.sub(r'(\w)-\s+(\w)', r'\1-\2', text)
+
+    # Fix words broken across a line by a hyphen
+    text = re.sub(r'(\w)-\s*\n\s*(\w)', r'\1\2', text)
+
+    return text  
+
+def extract_section(text, start_section, end_sections):
     lines = text.splitlines()
 
     start_index = -1
 
-    for i, line in enumerate(lines):
+    normalized_start = normalize_heading(start_section)
 
-        if line.strip().lower() == start_section.lower():
+    normalized_end_sections = [
+        normalize_heading(section)
+        for section in end_sections
+    ]
+
+    for i, line in enumerate(lines):
+        if normalize_heading(line.strip()) == normalized_start:
             start_index = i
             break
 
@@ -245,16 +266,14 @@ def extract_section(text, start_section, end_sections):
     section_lines = []
 
     for line in lines[start_index + 1:]:
+        clean_line = normalize_heading(line.strip())
 
-        clean_line = line.strip().lower()
-
-        if clean_line in [section.lower() for section in end_sections]:
+        if clean_line in normalized_end_sections:
             break
 
         section_lines.append(line)
 
-    return "\n".join(section_lines).strip()      
-
+    return "\n".join(section_lines).strip()
 
 def clean_text(text):
     text = text.replace("•","")
@@ -287,19 +306,21 @@ def upload():
     file_path =os.path.join(app.config['UPLOAD_FOLDER'],file.filename)
     file.save(file_path)
     resume_text=extract_text_from_pdf(file_path)
+    resume_text = normalize_pdf_text(resume_text)
     skills = extract_skills(resume_text)
     sections =detect_sections(resume_text)
     job_skills, matched_skills, missing_skills, match_score = match_job_skills(skills,job_description
 )   
     ai_match_score = calculate_ai_match(resume_text,job_description)
-    project_relevance_score = calculate_project_relevance(projects,job_description)
-    final_match_score =round( (match_score* 0.6)+(ai_match_score*0.4)) 
+    
     education =extract_section(resume_text,"education",["technical & academic projects",
         "projects","internship", "experience","leadership & responsibilities","soft skills"])
     
     projects = extract_section( resume_text,
     "technical & academic projects",
-    [
+    [     
+        
+        "relevant coursework",
         "internship",
         "experience",
         "leadership & responsibilities",
@@ -313,13 +334,17 @@ def upload():
         "leadership & responsibilities",
         "soft skills"
     ]
-)
+) 
+ 
+
     education = clean_text(education)    
     projects = clean_text(projects)    
     internship = clean_text(internship)   
     recommendations = generate_recommendations (skills,sections,projects) 
     score,summary_score,skill_score,education_score,projects_score,internship_score,leadership_score,softskill_score= calculate_score(skills,sections,projects)
 
+    project_relevance_score = calculate_project_relevance(projects,job_description)
+    final_match_score =round( (match_score* 0.4)+(ai_match_score*0.4)+ (project_relevance_score*0.2))
     return render_template("result.html",filename=file.filename,resume_text=resume_text,
     skills=skills,sections=sections,education=education,projects=projects,internship=internship,
     score = score,
