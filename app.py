@@ -220,6 +220,22 @@ def match_job_skills(skills, job_description):
         match_score
     ) 
 
+def generate_match_explanation(matched_skills, missing_skills):
+
+    explanations = []
+
+    for skill in matched_skills:
+        explanations.append(
+            f"Strong match in {skill}"
+        )
+
+    for skill in missing_skills:
+        explanations.append(
+            f"Missing {skill}"
+        )
+
+    return explanations
+
 def detect_sections(text):
     lines = text.splitlines()
     found_sections = []
@@ -309,8 +325,9 @@ def upload():
     resume_text = normalize_pdf_text(resume_text)
     skills = extract_skills(resume_text)
     sections =detect_sections(resume_text)
-    job_skills, matched_skills, missing_skills, match_score = match_job_skills(skills,job_description
-)   
+ 
+    job_skills, matched_skills, missing_skills, match_score = match_job_skills(skills,job_description)
+    match_explanations = generate_match_explanation(matched_skills, missing_skills)
     ai_match_score = calculate_ai_match(resume_text,job_description)
     
     education =extract_section(resume_text,"education",["technical & academic projects",
@@ -356,6 +373,7 @@ def upload():
     leadership_score=leadership_score,
     softskill_score=softskill_score,
     recommendations = recommendations,
+    match_explanations=match_explanations,
     job_description = job_description,
     job_skills=job_skills,
     matched_skills=matched_skills,
