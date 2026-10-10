@@ -107,13 +107,26 @@
 
        <h2> FINAL AI MATCH SCORE:</h2>
        <h1>{{final_match_score}}%</h1>
-       <h3>AI Match Explanation</h3>
 
-    <ul>
-     {% for explanation in match_explanations %}
-        <li>{{ explanation }}</li>
-     {% endfor %}
-    </ul>
+
+     <h3>AI Match Explanation</h3>
+ 
+  <h4>Matched Skills</h4>
+
+   <ul>
+    {% for skill in match_explanations["matched"] %}
+        <li>✓ {{ skill }}</li>
+    {% endfor %}
+  </ul>
+
+  
+  <h4>Missing Skills</h4>
+
+   <ul>
+    {% for skill in match_explanations["missing"] %}
+        <li>⚠ {{ skill }}</li>
+    {% endfor %}
+   </ul>
         <br>
         <a href ="/">
             <button type="button">Back To Home</button>

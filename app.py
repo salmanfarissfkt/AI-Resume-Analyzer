@@ -3,8 +3,15 @@ import os
 import re
 from pypdf import PdfReader
 from embedding import get_embedding
-from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
+def cosine_similarity(a, b):
+    denominator = np.linalg.norm(a) * np.linalg.norm(b)
+
+    if denominator == 0:
+        return 0.0
+
+    return float(np.dot(a, b) / denominator)
 
 app = Flask(__name__)
 
@@ -136,14 +143,12 @@ def calculate_ai_match(resume_text, job_description,normalize_embeddings=True):
     job_embedding = get_embedding(job_description)
 
     similarity = cosine_similarity(
-        [resume_embedding],
-        [job_embedding]
-    )[0][0]
-
+    resume_embedding,
+    job_embedding
+)
     match_score = round(similarity * 100)
 
     return match_score   
-
 def calculate_project_relevance(projects, job_description):
 
     if not projects.strip():
@@ -153,14 +158,13 @@ def calculate_project_relevance(projects, job_description):
     job_embedding = get_embedding(job_description)
 
     similarity = cosine_similarity(
-        [project_embedding],
-        [job_embedding]
-    )[0][0]
+        project_embedding,
+        job_embedding
+    )
 
     project_score = round(similarity * 100)
 
     return project_score
-
 def match_job_skills(skills, job_description):
 
     job_skills = extract_skills(job_description)
@@ -222,19 +226,10 @@ def match_job_skills(skills, job_description):
 
 def generate_match_explanation(matched_skills, missing_skills):
 
-    explanations = []
-
-    for skill in matched_skills:
-        explanations.append(
-            f"Strong match in {skill}"
-        )
-
-    for skill in missing_skills:
-        explanations.append(
-            f"Missing {skill}"
-        )
-
-    return explanations
+    return {
+        "matched": matched_skills,
+        "missing": missing_skills
+    }
 
 def detect_sections(text):
     lines = text.splitlines()
@@ -250,14 +245,45 @@ def detect_sections(text):
 def normalize_heading(text):
     return re.sub(r'[^a-z0-9]', '', text.lower())
 
+
 def normalize_pdf_text(text):
-    # Fix words broken by a hyphen and a space
-    text = re.sub(r'(\w)-\s+(\w)', r'\1-\2', text)
+    # Join words split by a hyphen at a line break.
+    text = re.sub(r'(?<=\w)-\s*\n\s*(?=\w)', '', text)
 
-    # Fix words broken across a line by a hyphen
-    text = re.sub(r'(\w)-\s*\n\s*(\w)', r'\1\2', text)
+    # Remove accidental spaces after a hyphen within a word.
+    text = re.sub(r'(?<=\w)-[ \t]+(?=\w)', '-', text)
 
-    return text  
+    # Repair known PDF extraction artifacts.
+    text = re.sub(
+        r'\bB\.\s*T\s*ech\b',
+        'B.Tech',
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r'\bT\s+rivandrum\b',
+        'Trivandrum',
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r'\bFine-T\s+uned\b',
+        'Fine-Tuned',
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r'\bRELEV\s+ANT\b',
+        'RELEVANT',
+        text,
+        flags=re.IGNORECASE
+    )
+
+    return text
+
 
 def extract_section(text, start_section, end_sections):
     lines = text.splitlines()
@@ -383,44 +409,62 @@ def upload():
     project_relevance_score = project_relevance_score,
     final_match_score=final_match_score)
 
-def generate_recommendations(skills,sections,projects):
-    recommendations=[]
 
-    if len(skills) < 5:
-        recommendations.append("add more relevent skills to your resume")
+def generate_recommendations(skills, sections, projects):
+    recommendations = []
 
-    if "professional summary" not in sections:
-       recommendations.append("add professional summary at the begining of resume")
-    
-    if "education" not in sections:
-        recommendations.append("Add an education section with your degree and institution.")
-
-    if "projects" not in sections and "technical & academic projects" not in sections:
+    if len(set(skills)) < 5:
         recommendations.append(
-            "Add technical projects to demonstrate your practical skills."
+            "Add more relevant technical skills that you genuinely possess."
         )
 
-    if len(projects) < 250:
+    if "professional summary" not in sections:
         recommendations.append(
-            "Add more details and achievements to your project descriptions."
+            "Add a professional summary highlighting your strengths and target role."
+        )
+
+    if "education" not in sections:
+        recommendations.append(
+            "Add an education section with your degree and institution."
+        )
+
+    if (
+        "projects" not in sections
+        and "technical & academic projects" not in sections
+    ):
+        recommendations.append(
+            "Add technical projects that demonstrate your practical skills."
+        )
+    elif len(projects.strip()) < 250:
+        recommendations.append(
+            "Expand your project descriptions with your contributions, "
+            "technologies used, and outcomes."
         )
 
     if "internship" not in sections and "experience" not in sections:
         recommendations.append(
-            "Consider adding internship or work experience."
+            "Consider adding relevant internship, work, or practical experience."
+        )
+
+    if "leadership & responsibilities" not in sections:
+        recommendations.append(
+            "If applicable, include leadership or teamwork experience."
         )
 
     if "soft skills" not in sections:
         recommendations.append(
-            "Add relevant soft skills such as teamwork and communication."
+            "Include relevant soft skills supported by your actual experience."
         )
 
-    if len(recommendations) == 0:
+    if not recommendations:
         recommendations.append(
-            "Your resume has a strong overall structure. Keep improving your project details and skills."
+            "Your resume includes the main sections checked by this analyzer. "
+            "Next, review achievement details, spelling, formatting, and "
+            "alignment with the target job description."
         )
 
     return recommendations
+
 def calculate_score(skills,sections,projects):
     score = 0
     summary_score = 0
@@ -433,7 +477,7 @@ def calculate_score(skills,sections,projects):
     if "professional summary" in sections:
         summary_score = 10
 
-    skill_score = min(len(skills) * 2, 25)
+    skill_score = min(len(set(skills)) * 2, 25)
     
           
 
@@ -457,6 +501,7 @@ def calculate_score(skills,sections,projects):
     if "soft skills" in sections:
         softskill_score = 5
     score = (summary_score + skill_score + education_score + projects_score + internship_score + leadership_score + softskill_score)
+ 
     return score,summary_score,skill_score,education_score,projects_score,internship_score,leadership_score,softskill_score
 
 @app.route("/about")
