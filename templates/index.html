@@ -1,36 +1,54 @@
+
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>AI RESUME ANALYZER</title>
-        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}" >       
-    </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer</title>
 
-    <body>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
     <div class="container">
-        <h1>WELCOME TO AI RESUME ANALYZER HOME</h1>
 
-    <p class="subtitle">
-        Upload your resume and get ai review....
-    </p>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <h1>AI Resume Analyzer</h1>
 
-    <input type = "file" name="resume" required>
-    <br><br>
+        <p class="subtitle">
+            Analyze your resume, identify skill gaps, and discover
+            how well your profile matches a job.
+        </p>
 
-    <label> Job Description </label>
-    <br><br>
-    <textarea name = "job_description"
-              rows = "10"
-              cols = "60"
-              placeholder="paste job description here..."
-              required>
-            </textarea>
-    <button type="submit" name >submit</button>
-    <a href="/about">
-        <button type="button">about</button>
-    </a>
-    </form>
-        <p>POWERED BY SFKT TECHNOLOGIES</p>
-    </div>   
-    </body>
+        <form action="/upload"
+              method="POST"
+              enctype="multipart/form-data">
+
+            <label for="resume">Upload your resume (PDF)</label>
+            <input type="file"
+                   id="resume"
+                   name="resume"
+                   accept=".pdf,application/pdf"
+                   required>
+
+            <label for="job_description">Job Description</label>
+            <textarea id="job_description"
+                      name="job_description"
+                      rows="10"
+                      placeholder="Paste the complete job description here..."
+                      required></textarea>
+
+            <button type="submit">Analyze My Resume</button>
+        </form>
+
+        <p>
+            <a href="{{ url_for('about') }}">About this project</a>
+        </p>
+
+        <p class="footer">
+            Powered by SFKT Technologies
+        </p>
+
+    </div>
+</body>
 </html>

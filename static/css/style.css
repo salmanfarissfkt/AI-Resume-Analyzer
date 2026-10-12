@@ -418,3 +418,94 @@ details summary {
     }
 }
 
+
+/* Resume upload improvements */
+
+form input[type="file"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 12px 0 24px;
+    padding: 14px;
+    border: 2px dashed #b8c7dc;
+    border-radius: 10px;
+    background-color: #f8fafc;
+    cursor: pointer;
+}
+
+form input[type="file"]:hover {
+    border-color: #2563eb;
+    background-color: #eff6ff;
+}
+
+form input[type="file"]:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+
+/* Job description field improvements */
+
+form textarea[name="job_description"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 220px;
+    padding: 15px;
+    margin: 12px 0 24px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+form textarea[name="job_description"]::placeholder {
+    color: #94a3b8;
+}
+
+form textarea[name="job_description"]:focus {
+    outline: none;
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/*  Analyze button improvements */
+
+form button[type="submit"] {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+form button[type="submit"]:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    transform: translateY(-1px);
+}
+
+form button[type="submit"]:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+form button[type="submit"]:active {
+    transform: translateY(0);
+}
